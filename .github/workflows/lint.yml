@@ -2,7 +2,9 @@ name: Lint Check
 
 on:
   pull_request:
-    branches: [feature/**, bugfix/**]
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
 
 jobs:
   lint:

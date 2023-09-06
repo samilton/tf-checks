@@ -25,3 +25,7 @@ resource "aws_instance" "main_server" {
     cpu_credits = "unlimited"
   }
 }
+
+resource "ebs_volume" "main_volume" {
+
+}

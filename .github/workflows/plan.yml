@@ -1,0 +1,53 @@
+name: terraform-automation
+
+on:
+  push:
+    paths:
+    - './**'
+
+concurrency:
+  group: ${{ github.action == 'terraform-automation' }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: .
+
+jobs:
+  terraform_plan:
+    name: 'Terraform Plan'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup GCP Service Account
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: 'latest'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        continue-on-error: true
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/workflows/tf_init.sh"
+          "${GITHUB_WORKSPACE}/.github/workflows/tf_init.sh"
+          chmod +x "${GITHUB_WORKSPACE}/.github/workflows/tf_fmt.sh"
+          "${GITHUB_WORKSPACE}/.github/workflows/tf_fmt.sh"
+          chmod +x "${GITHUB_WORKSPACE}/.github/workflows/tf_plan_check.sh"
+          "${GITHUB_WORKSPACE}/.github/workflows/tf_plan_check.sh"
+
+          terraform plan -out "tf_plan" -input=false
+      - name: Upload TF Plan
+        uses: actions/upload-artifact@v2
+        with:
+          name: tf_plan
+          path: ./tf_plan
+          if-no-files-found: error
+          retention-days: 1

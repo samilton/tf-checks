@@ -30,3 +30,5 @@ resource "aws_lambda_function" "on_sns" {
 
 
 }
+
+resource "aws_instance" "secondary_server" {}

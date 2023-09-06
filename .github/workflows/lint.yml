@@ -1,14 +1,11 @@
 name: Lint Check
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - synchronized
-      - reopened
+  pull_request:
 
 jobs:
   lint:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

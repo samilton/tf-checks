@@ -1,0 +1,22 @@
+name: Lint Check
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronized
+      - reopened
+
+jobs:
+  lint:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.6
+
+      - name: Run terraform fmt checkout
+        run: terraform fmt -check -diff -recursive .
